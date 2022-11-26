@@ -18,9 +18,13 @@ class App
   def response
     return [404, headers, ['Not Found']] if @path != '/time'
 
-    [200, headers, TimeFormatter.new(@received_format).call]
+    time_formatter = TimeFormatter.new(@received_format)
+    time_formatter.call
 
-  rescue RuntimeError => e
-    [400, headers, [e.message]]
+    if time_formatter.success
+      [200, headers, [time_formatter.formatted_time]]
+    else
+      [400, headers, ["Unknown time format #{time_formatter.unknown_time_formats}"]]
+    end
   end
 end

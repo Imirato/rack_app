@@ -12,20 +12,25 @@ class TimeFormatter
     @received_format = received_format
   end
 
-  def call
-    raise "Unknown time format #{unknown_time_format}" unless acceptable_format?
+  attr_reader :success, :formatted_time, :unknown_time_formats
 
-    [received_format_conversion]
+  def call
+    if acceptable_format?
+      @success = true
+      @formatted_time = received_format_conversion
+    else
+      @success = false
+    end
   end
 
   private
 
   def acceptable_format?
-    unknown_time_format.empty?
+    invalid_formats.empty?
   end
 
-  def unknown_time_format
-    @received_format - ACCEPTABLE_FORMAT.keys.map(&:to_s)
+  def invalid_formats
+    @unknown_time_formats ||= @received_format - ACCEPTABLE_FORMAT.keys.map(&:to_s)
   end
 
   def received_format_conversion
